@@ -25,7 +25,13 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 	def find_all_under_cursor(self, view):
 		# view.window().run_command('find_all_under')
 		the_cursor = view.sel()[0]
-		the_word_region = view.word(the_cursor)
-		the_word = view.substr(the_word_region)
-		all_word_regions = view.find_all("\\b" + the_word + "\\b")
+		# if no selection then expand to word under cursor and find all using word boundaries
+		if(the_cursor.a == the_cursor.b):
+			the_word_region = view.word(the_cursor)
+			the_word = "\\b" + view.substr(the_word_region) + "\\b"
+		# if there is visual selection, just use it to find all without word boundaries
+		else:
+			the_word_region = the_cursor
+			the_word = view.substr(the_word_region)
+		all_word_regions = view.find_all(the_word)			
 		return all_word_regions
