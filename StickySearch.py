@@ -9,18 +9,25 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 
 		if 'add' in op:
 			regions = self.find_all_under_cursor(self.view) + view.get_regions(key)
-			self.mark(key, view, regions)	
+			self.mark(key, view, regions)
 		if 'clear' in op:
 			view.erase_regions(key)
 		if 'set' in op:
 			regions = self.find_all_under_cursor(self.view)
 			self.mark(key, view, regions)
-		
+
 	def mark(self, key, view, regions):
-		# optional icon name, if given, will draw the named icons in the gutter next to each region. 
-		# The icon will be tinted using the color associated with the scope. 
+		settings = sublime.load_settings("StickySearch.sublime-settings")
+		icon_name = settings.get("icon", "dot")
+		flags = sublime.PERSISTENT
+		if not settings.get("fill", False):
+			flags |= sublime.DRAW_NO_FILL
+		if not settings.get("outline", True):
+			flags |= sublime.DRAW_NO_OUTLINE
+		# optional icon name, if given, will draw the named icons in the gutter next to each region.
+		# The icon will be tinted using the color associated with the scope.
 		# Valid icon names are dot, circle, bookmark and cross
-		view.add_regions(key, regions, "marker", "dot", sublime.PERSISTENT | sublime.DRAW_OUTLINED)
+		view.add_regions(key, regions, "marker", icon_name, flags)
 
 	def find_all_under_cursor(self, view):
 		# view.window().run_command('find_all_under')
@@ -33,5 +40,5 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 		else:
 			the_word_region = the_cursor
 			the_word = view.substr(the_word_region)
-		all_word_regions = view.find_all(the_word)			
+		all_word_regions = view.find_all(the_word)
 		return all_word_regions
