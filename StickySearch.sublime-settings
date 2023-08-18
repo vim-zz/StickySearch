@@ -6,5 +6,7 @@
     "icon": "dot",
     // Style of search highlighting
     "fill": false,
-    "outline": true
+    "outline": true,
+    // Use different colors for additional selections
+    "rainbow": true
 }
