@@ -1,20 +1,34 @@
 # StickySearch
 
-Sublime Text 3 plugin - persistent highlight of selected text.
+A Sublime Text plugin - persistently highlighting selected text. This plugin is designed
+to elevate your text highlighting experience, drawing inspiration from VIM's keyword search functionality.
 
-## Usage
+Compatible with Sublime Text 3 and 4.
 
-To hightlight text under cursor:
+## How It Works
 
-	Super + 8 for Mac OS X
-	Ctrl + 8 for Windows/Linux
+To highlight text under the cursor:
 
-To highlight more text (while keeping previous highlights):
+- macOS: `Command + 8`
+- Windows/Linux: `Ctrl + 8`
 
-	Shift + Super + 8 for Mac OS X
-	Shift + Ctrl + 8 for Windows/Linux
+To highlight more text (while retaining previous highlights):
+
+- macOS: Shift + `Command + 8`
+- Windows/Linux: `Shift + Ctrl + 8`
 
 To clear all highlighted text:
 
-	Alt + Super + 8 for Mac OS X
-	Alt + Ctrl + 8 for Windows/Linux
+- macOS: Alt + `Command + 8`
+- Windows/Linux: `Alt + Ctrl + 8`
+
+## Customization
+
+You can change the following settings:
+
+| Parameter | Values                              | Description                                         |
+|-----------|-------------------------------------|-----------------------------------------------------|
+| `icon`    | `dot`, `circle`, `bookmark`, `cross`| When provided, the named icon will be displayed in the gutter |
+| `fill`    | `true`, `false`                     | When set to `true`, it adds a background color to marked text |
+| `outline` | `true`, `false`                     | When set to `true`, it encloses marked text with a colored frame |
+| `rainbow` | `true`, `false`                     | When set to `true`, different colors are used for each added selection |
