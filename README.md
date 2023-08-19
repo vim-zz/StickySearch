@@ -7,6 +7,10 @@ Compatible with Sublime Text 3 and 4.
 
 ![](example.png)
 
+## Install
+
+Search for StickySearch in [Package Control](https://packagecontrol.io/packages/StickySearch).
+
 ## How It Works
 
 To highlight text under the cursor:
