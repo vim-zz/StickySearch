@@ -1,3 +1,4 @@
+import re
 import sublime, sublime_plugin
 
 #view.run_command("stickysearch")
@@ -18,22 +19,23 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 	def run(self, edit, op):
 		# keep sticky per window (each window has its own set)
 		if 'add' in op:
-			self.op_add()
+			self.op_add(self.view)
 		if 'clear' in op:
-			self.op_clear()
+			self.op_clear(self.view)
 		if 'set' in op:
-			self.op_clear()
-			self.op_add()
+			self.op_clear(self.view)
+			self.op_add(self.view)
 
-	def op_add(self):
-		regions = self.find_all_under_cursor(self.view)
+	def op_add(self, view):
+		selection = self.find_all_under_cursor(view)
+		regions = view.find_all(selection)
 		key = self._keybase + str(len(self._keys))
-		self.mark(key, self.view, regions)
+		self.mark(key, view, regions)
 		self._keys.append(key)
 
-	def op_clear(self):
+	def op_clear(self, view):
 		for key in self._keys:
-			self.view.erase_regions(key)
+			view.erase_regions(key)
 		self._keys = []
 
 	def mark(self, key, view, regions):
@@ -61,14 +63,18 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 
 	def find_all_under_cursor(self, view):
 		# view.window().run_command('find_all_under')
-		the_cursor = view.sel()[0]
-		# if no selection then expand to word under cursor and find all using word boundaries
-		if(the_cursor.a == the_cursor.b):
-			the_word_region = view.word(the_cursor)
-			the_word = "\\b" + view.substr(the_word_region) + "\\b"
+		sel = view.sel()[0]
 		# if there is visual selection, just use it to find all without word boundaries
+		# if no selection then expand to word under cursor and find all using word boundaries
+		has_selection = sel.a != sel.b
+		if has_selection:
+			the_word_region = sel
+			selected_txt = view.substr(the_word_region)
+			# support special charecters 
+			selected_word = re.escape(selected_txt)
 		else:
-			the_word_region = the_cursor
-			the_word = view.substr(the_word_region)
-		all_word_regions = view.find_all(the_word)
-		return all_word_regions
+			the_word_region = view.word(sel)
+			selected_word = "\\b" + view.substr(the_word_region) + "\\b"
+		
+		return selected_word
+
