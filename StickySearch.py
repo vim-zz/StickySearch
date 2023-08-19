@@ -19,26 +19,57 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 	def run(self, edit, op):
 		# keep sticky per window (each window has its own set)
 		if 'add' in op:
-			self.op_add(self.view)
+			self.op_add()
 		if 'clear' in op:
-			self.op_clear(self.view)
+			self.op_clear()
 		if 'set' in op:
-			self.op_clear(self.view)
-			self.op_add(self.view)
+			self.op_clear()
+			self.op_add()
 
-	def op_add(self, view):
-		selection = self.find_all_under_cursor(view)
-		regions = view.find_all(selection)
-		key = self._keybase + str(len(self._keys))
-		self.mark(key, view, regions)
-		self._keys.append(key)
+	def op_add(self):
+		selected_region = self.view.sel()[0]
+		selected_word = self.selection_under_cursor(selected_region)
+		key = self.marker_key(selected_word)
+		regions = self.view.find_all(selected_word)
+		# Mark new selections, or jump to next resion on exsiting marks
+		if key not in self._keys:
+			self.mark(key, regions)
+			self._keys.append(key)
+		else:
+			self.jump_to_next_match(selected_region, regions)
 
-	def op_clear(self, view):
+	def op_clear(self):
+		selected_region = self.view.sel()[0]
+		selected_word = self.selection_under_cursor(selected_region)
+		marker_key = self.marker_key(selected_word)
+		
+		preserve_keys = []
 		for key in self._keys:
-			view.erase_regions(key)
-		self._keys = []
+			if key != marker_key:
+				self.view.erase_regions(key)
+			else:
+				preserve_keys.append(marker_key)
+		
+		self._keys = preserve_keys
 
-	def mark(self, key, view, regions):
+	def marker_key(self, uid):
+		return f"{self._keybase}_{uid}"
+
+	def jump_to_next_match(self, sel, regions):
+		the_word_region = self.region_under_cursor(sel)
+		for pos in regions:
+			if pos.a > the_word_region.a:
+				break
+		else:
+			# cycle back to first match
+			pos = regions[0]
+
+		pos.b = pos.a
+		self.view.sel().clear() 
+		self.view.sel().add(pos)
+		self.view.show(pos)
+		
+	def mark(self, key, regions):
 		settings = sublime.load_settings("StickySearch.sublime-settings")
 		flags = sublime.PERSISTENT
 		if not settings.get("fill", False):
@@ -59,22 +90,31 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 			scope = self._scopes[next_marker_index % num_of_available_scopes]
 		else:
 			scope = "region.yellowish"
-		view.add_regions(key, regions, scope, icon_name, flags)
+		
+		self.view.add_regions(key, regions, scope, icon_name, flags)
 
-	def find_all_under_cursor(self, view):
-		# view.window().run_command('find_all_under')
-		sel = view.sel()[0]
+	def selection_under_cursor(self, sel):
 		# if there is visual selection, just use it to find all without word boundaries
 		# if no selection then expand to word under cursor and find all using word boundaries
 		has_selection = sel.a != sel.b
 		if has_selection:
 			the_word_region = sel
-			selected_txt = view.substr(the_word_region)
+			selected_txt = self.view.substr(the_word_region)
 			# support special charecters 
 			selected_word = re.escape(selected_txt)
 		else:
-			the_word_region = view.word(sel)
-			selected_word = "\\b" + view.substr(the_word_region) + "\\b"
+			the_word_region = self.view.word(sel)
+			selected_word = "\\b" + self.view.substr(the_word_region) + "\\b"
 		
 		return selected_word
 
+	def region_under_cursor(self, sel):
+		# if there is visual selection, just use it to find all without word boundaries
+		# if no selection then expand to word under cursor and find all using word boundaries
+		has_selection = sel.a != sel.b
+		if has_selection:
+			the_word_region = sel
+		else:
+			the_word_region = self.view.word(sel)
+
+		return the_word_region
