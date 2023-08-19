@@ -53,7 +53,7 @@ class StickysearchCommand(sublime_plugin.TextCommand):
 		self._keys = preserve_keys
 
 	def marker_key(self, uid):
-		return f"{self._keybase}_{uid}"
+		return self._keybase + uid
 
 	def jump_to_next_match(self, sel, regions):
 		the_word_region = self.region_under_cursor(sel)
