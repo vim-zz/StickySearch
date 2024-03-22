@@ -15,18 +15,18 @@ Search for StickySearch in [Package Control](https://packagecontrol.io/packages/
 
 To highlight text under the cursor:
 
-- macOS: `Command + 8`
-- Windows/Linux: `Ctrl + 8`
+- macOS: `Command` + `8`
+- Windows/Linux: `Ctrl` + `8`
 
 To highlight more text (while retaining previous highlights):
 
-- macOS: Shift + `Command + 8`
-- Windows/Linux: `Shift + Ctrl + 8`
+- macOS: `Shift` + `Command` + `8`
+- Windows/Linux: `Shift` + `Ctrl` + `8`
 
 To clear all highlighted text:
 
-- macOS: Alt + `Command + 8`
-- Windows/Linux: `Alt + Ctrl + 8`
+- macOS: `Alt` + `Command` + `8`
+- Windows/Linux: `Alt` + `Ctrl` + `8`
 
 ## Customization
 
